@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Cookie Clicker</title>
+<meta name="description" content="Click the cookie. Bake more cookies. Buy things that bake cookies for you." />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='46' fill='%23d99a3f'/%3E%3Ccircle cx='36' cy='38' r='8' fill='%233a2313'/%3E%3Ccircle cx='64' cy='52' r='9' fill='%233a2313'/%3E%3Ccircle cx='45' cy='70' r='7' fill='%233a2313'/%3E%3C/svg%3E" />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-cookie" aria-hidden="true">🍪</span>
+      <span>Cookie Clicker</span>
+    </div>
+    <div class="top-actions">
+      <button id="soundBtn" class="icon-btn" type="button" aria-pressed="false" title="Toggle click sound">🔇<span class="sr-only">Toggle sound</span></button>
+      <button id="resetBtn" class="ghost-btn" type="button">Reset</button>
+    </div>
+  </header>
+
+  <main class="game">
+    <section class="bakery" aria-label="Bakery">
+      <div class="counter">
+        <h1 id="cookieCount">0</h1>
+        <p class="counter-sub">
+          <span class="pill" id="cpsLabel">0 per second</span>
+          <span class="pill pill-dim" id="clickLabel">1 per click</span>
+        </p>
+      </div>
+
+      <div class="cookie-stage" id="stage">
+        <div class="halo" aria-hidden="true"></div>
+        <button class="cookie" id="bigCookie" type="button" aria-label="Bake a cookie">
+          <svg class="cookie-svg" viewBox="0 0 200 200" aria-hidden="true" focusable="false">
+            <defs>
+              <radialGradient id="dough" cx="36%" cy="30%" r="76%">
+                <stop offset="0%" stop-color="#eec077" />
+                <stop offset="52%" stop-color="#d1954a" />
+                <stop offset="100%" stop-color="#a4652a" />
+              </radialGradient>
+              <radialGradient id="chip" cx="34%" cy="28%" r="78%">
+                <stop offset="0%" stop-color="#6b4429" />
+                <stop offset="100%" stop-color="#2b1709" />
+              </radialGradient>
+            </defs>
+            <circle cx="100" cy="104" r="90" fill="#000" opacity=".28" />
+            <circle cx="100" cy="100" r="89" fill="url(#dough)" />
+            <circle cx="100" cy="100" r="80" fill="none" stroke="#b57833" stroke-opacity=".45" stroke-width="3" stroke-dasharray="4 9" />
+            <g fill="url(#chip)">
+              <ellipse cx="66" cy="63" rx="13" ry="11" transform="rotate(-16 66 63)" />
+              <ellipse cx="128" cy="82" rx="15" ry="13" transform="rotate(22 128 82)" />
+              <ellipse cx="88" cy="118" rx="16" ry="14" transform="rotate(-8 88 118)" />
+              <ellipse cx="139" cy="132" rx="11" ry="9" transform="rotate(34 139 132)" />
+              <ellipse cx="58" cy="134" rx="9" ry="8" transform="rotate(12 58 134)" />
+              <ellipse cx="105" cy="165" rx="10" ry="8" transform="rotate(-24 105 165)" />
+            </g>
+            <g fill="#000" opacity=".18">
+              <circle cx="78" cy="95" r="3" />
+              <circle cx="112" cy="47" r="2.5" />
+              <circle cx="152" cy="104" r="2.5" />
+              <circle cx="99" cy="139" r="2.5" />
+              <circle cx="52" cy="96" r="2.5" />
+              <circle cx="122" cy="158" r="2.5" />
+            </g>
+            <ellipse cx="72" cy="52" rx="34" ry="18" fill="#fff" opacity=".13" transform="rotate(-26 72 52)" />
+          </svg>
+        </button>
+        <div class="floaters" id="floaters" aria-hidden="true"></div>
+      </div>
+
+      <div class="buffs" id="buffBar" aria-live="polite"></div>
+      <p class="hint">Click the cookie to bake. Buy things in the shop and they'll bake while you're away.</p>
+    </section>
+
+    <aside class="shop" aria-label="Shop">
+      <nav class="tabs" role="tablist">
+        <button class="tab is-active" type="button" role="tab" aria-selected="true" data-tab="store">Store</button>
+        <button class="tab" type="button" role="tab" aria-selected="false" data-tab="upgrades">Upgrades<span class="badge" id="upgBadge" hidden>0</span></button>
+        <button class="tab" type="button" role="tab" aria-selected="false" data-tab="stats">Stats</button>
+      </nav>
+
+      <div class="tab-panel" id="panel-store" role="tabpanel">
+        <div class="panel-head">
+          <span class="panel-title">Buildings</span>
+          <div class="buy-modes" id="buyModes" role="group" aria-label="Purchase amount">
+            <button class="buy-mode is-active" type="button" data-amount="1">×1</button>
+            <button class="buy-mode" type="button" data-amount="10">×10</button>
+            <button class="buy-mode" type="button" data-amount="100">×100</button>
+          </div>
+        </div>
+        <div class="buildings" id="buildings"></div>
+      </div>
+
+      <div class="tab-panel is-hidden" id="panel-upgrades" role="tabpanel">
+        <div class="panel-head"><span class="panel-title">Upgrades</span></div>
+        <div class="upgrades" id="upgrades"></div>
+        <p class="empty" id="noUpgrades">No upgrades available yet. Keep baking and buying buildings.</p>
+      </div>
+
+      <div class="tab-panel is-hidden" id="panel-stats" role="tabpanel">
+        <div class="panel-head"><span class="panel-title">Statistics</span></div>
+        <dl class="stats">
+          <div><dt>Cookies in bank</dt><dd id="statBank">0</dd></div>
+          <div><dt>Cookies baked (all time)</dt><dd id="statBaked">0</dd></div>
+          <div><dt>Cookies per second</dt><dd id="statCps">0</dd></div>
+          <div><dt>Cookies per click</dt><dd id="statClick">1</dd></div>
+          <div><dt>Hand-baked cookies</dt><dd id="statHandmade">0</dd></div>
+          <div><dt>Clicks</dt><dd id="statClicks">0</dd></div>
+          <div><dt>Buildings owned</dt><dd id="statBuildings">0</dd></div>
+          <div><dt>Upgrades bought</dt><dd id="statUpgrades">0</dd></div>
+          <div><dt>Golden cookies found</dt><dd id="statGolden">0</dd></div>
+          <div><dt>Achievements</dt><dd id="statAch">0 / 0</dd></div>
+          <div><dt>Time baking</dt><dd id="statTime">0s</dd></div>
+        </dl>
+        <div class="panel-head panel-head-sub"><span class="panel-title">Achievements</span></div>
+        <ul class="achievements" id="achievements"></ul>
+      </div>
+    </aside>
+  </main>
+
+  <div class="toasts" id="toasts" aria-live="polite"></div>
+</div>
+<script src="game.js"></script>
+</body>
+</html>
